@@ -321,7 +321,7 @@ GameObject:
   - component: {fileID: 1309717401}
   - component: {fileID: 1309717400}
   m_Layer: 0
-  m_Name: Terrain
+  m_Name: SoccerField
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

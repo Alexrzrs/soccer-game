@@ -68,7 +68,7 @@ public class Balon : MonoBehaviour
         if(curveToggle != null && curveToggle.isOn)
         {
             powerShot.isOn = false;
-            distance = 5f;
+            distance = 1f;
             curve();
         }
 
@@ -97,12 +97,12 @@ public class Balon : MonoBehaviour
 
         Vector3 curveForce = Vector3.Cross(lateralDirection * 0.6f, Physics.gravity.normalized) * curveStrength * speed;
 
-        if(target.position.x > 3f)
+        if(target.position.x > 2f)
         {
             GetComponent<Rigidbody>().AddForce(-curveForce, ForceMode.Force);
         }
 
-        if(target.position.x < -3f)
+        if(target.position.x < -2f)
         {
             GetComponent<Rigidbody>().AddForce(curveForce, ForceMode.Force);
         }

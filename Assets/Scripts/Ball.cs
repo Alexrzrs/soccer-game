@@ -190,7 +190,7 @@ IEnumerator KickWaitCoroutine() {
 
     if (contador == 3) {
         Vector3 nuevaPosicion = transform.position;
-        nuevaPosicion.z = 39.0f;
+        nuevaPosicion.z = 30.0f;
         transform.position = nuevaPosicion;
         StartPos = transform.position;
     }

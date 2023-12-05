@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Pole
   - Net
+  - Coleccionable
   layers:
   - Default
   - TransparentFX

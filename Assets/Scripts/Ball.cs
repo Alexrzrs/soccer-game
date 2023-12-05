@@ -2,9 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class Balon : MonoBehaviour
 {
+
+   public TextMeshProUGUI countText;
+   private int contador;
+   private bool colisionOcurridaEsteTurno = false;
 
     [Header("Target")]
     public Transform target;
@@ -18,6 +23,7 @@ public class Balon : MonoBehaviour
     public Slider forceUI;
     public Toggle curveToggle;
     public Toggle powerShot;
+    
     
     [Header("Goal Keeper")]
     GoalKeeperScript goal;
@@ -34,9 +40,14 @@ public class Balon : MonoBehaviour
     Vector3 lateralDirection;
 
 
+    
+
+
     // Start is called before the first frame update
     void Start()
     {
+
+        contador = 0;
         StartPos = transform.position;
         GoalPos = GoalKeeperScript.transform.position;
         forceUI.gameObject.SetActive(false);
@@ -56,7 +67,7 @@ public class Balon : MonoBehaviour
         // Patear al levantar key
         if(Input.GetKeyUp(KeyCode.Space)) 
         {
-            StartCoroutine(Wait());
+            StartCoroutine(KickWaitCoroutine());
         }
 
         if(Force > maxForce)
@@ -119,38 +130,70 @@ public class Balon : MonoBehaviour
         {
             curveToggle.isOn = false;
         }
+
+       
+    }
+   void OnTriggerEnter(Collider otro) {
+    if (otro.gameObject.CompareTag("Coleccionable") && !colisionOcurridaEsteTurno) {
+        contador++;
+        countText.text = "Marcador: " + contador.ToString();
+        colisionOcurridaEsteTurno = true;
+
+        if (contador % 3 == 0) {
+            float nuevaPosicionZ = 39.0f - ((contador / 3) * 2);
+            StartCoroutine(MoverBalon(nuevaPosicionZ));
+        }
+    }   
+}
+
+public void slider() {
+    forceUI.value = Force;
+} 
+
+public void ResetGauge() {
+    Force = 0;
+    forceUI.value = 0;
+}
+
+IEnumerator MoverBalon(float nuevaPosicionZ) {
+    Vector3 direccion = Vector3.back; // Vector que representa el movimiento hacia atrás
+
+    while (transform.position.z > nuevaPosicionZ) {
+        Vector3 nuevaPosicion = transform.position + direccion * Time.deltaTime; // Mueve el balón hacia atrás
+        transform.position = nuevaPosicion;
+        yield return null;
     }
 
-    public void slider()
-    {
-        forceUI.value = Force;
-    } 
+    StartPos = transform.position; // Actualiza la nueva posición inicial
+}
 
-    public void ResetGauge()
-    {
-        Force = 0;
-        forceUI.value = 0;
+IEnumerator KickWaitCoroutine() {
+    yield return new WaitForSeconds(1.5f);
+    forceUI.gameObject.SetActive(false);
+    shoot();
+    yield return new WaitForSeconds(0.05f);
+    FindObjectOfType<GoalKeeperScript>().GoalMove();
+    yield return new WaitForSeconds(1.5f);
+    ResetGauge(); // Restablecer slider y fuerza
+
+    GetComponent<Rigidbody>().angularDrag = 40;
+    yield return new WaitForSeconds(3f);
+
+    GetComponent<Rigidbody>().velocity = Vector3.zero;
+    transform.position = StartPos; // Restablecer posicion del balon
+    GoalKeeperScript.transform.position = GoalPos; // Restablecer posicion del portero
+    curveStrength = 1.5f;
+
+    FindObjectOfType<GoalKeeperScript>().Reset();
+    FindObjectOfType<GoalKeeperScript>().Move = 0; // Restablecer index del portero
+    colisionOcurridaEsteTurno = false; // Restablecer el turno para el collider
+
+    if (contador == 3) {
+        Vector3 nuevaPosicion = transform.position;
+        nuevaPosicion.z = 39.0f;
+        transform.position = nuevaPosicion;
+        StartPos = transform.position;
     }
-
-    IEnumerator Wait() 
-    {
-        yield return new WaitForSeconds(1.5f); 
-        forceUI.gameObject.SetActive(false);
-        shoot();
-        yield return new WaitForSeconds(0.05f);
-        FindObjectOfType<GoalKeeperScript>().GoalMove();
-        yield return new WaitForSeconds(1.5f);
-        ResetGauge(); // Restablecer slider y fuerza
-
-        GetComponent<Rigidbody>().angularDrag = 40;
-        yield return new WaitForSeconds(3f);
-
-        GetComponent<Rigidbody>().velocity = Vector3.zero;
-        transform.position = StartPos; // Restablecer posicion del balon
-        GoalKeeperScript.transform.position = GoalPos; // Restablecer posicion del portero
-        curveStrength = 1.5f;
-
-        FindObjectOfType<GoalKeeperScript>().Reset();
-        FindObjectOfType<GoalKeeperScript>().Move = 0; // Restablecer index del portero
-    }
+}
+  
 }

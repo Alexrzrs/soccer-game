@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Estadio/Midwest_Park.unity
+    guid: 745e2e67ed768904b977c70e61af2744
   m_configObjects: {}

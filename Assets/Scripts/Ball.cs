@@ -3,13 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
+using UnityEngine.SceneManagement;
 
 public class Balon : MonoBehaviour
 {
 
+   public event EventHandler GameOver;
+
+   public event EventHandler GameWin;
+
    public TextMeshProUGUI countText;
+
+   public GameObject[] vidas;
+
    private int contador;
+   
+  [SerializeField] private int vidasCont;
+
    private bool colisionOcurridaEsteTurno = false;
+
+   private bool anotacion = false;
+
 
     [Header("Target")]
     public Transform target;
@@ -46,8 +61,8 @@ public class Balon : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
         contador = 0;
+        vidasCont = 3;
         StartPos = transform.position;
         GoalPos = GoalKeeperScript.transform.position;
         forceUI.gameObject.SetActive(false);
@@ -138,12 +153,19 @@ public class Balon : MonoBehaviour
         contador++;
         countText.text = "Marcador: " + contador.ToString();
         colisionOcurridaEsteTurno = true;
+        anotacion = true;
 
         if (contador % 3 == 0) {
             float nuevaPosicionZ = 39.0f - ((contador / 3) * 2);
             StartCoroutine(MoverBalon(nuevaPosicionZ));
         }
-    }   
+    } 
+
+    if(!colisionOcurridaEsteTurno){
+        vidasCont--;
+        vidas[vidasCont].SetActive(false);
+    }
+
 }
 
 public void slider() {
@@ -194,6 +216,21 @@ IEnumerator KickWaitCoroutine() {
         transform.position = nuevaPosicion;
         StartPos = transform.position;
     }
+
+     if(anotacion){
+        anotacion = false;
+    } else {
+        vidasCont--;
+        vidas[vidasCont].SetActive(false);
+
+        if (vidasCont == 0) {
+            GameOver?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+
+    if(contador == 5) {
+        GameWin?.Invoke(this, EventArgs.Empty);
+    }
 }
-  
 }
